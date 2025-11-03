@@ -1,0 +1,52 @@
+config ZMK_WIDGET_CUSTOM_BLE_STATUS
+  bool "Widget for BLE status"
+  depends on ZMK_BLE && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+  select ZMK_FONT_PIXEL_MPLUS_BOLD_10
+  select ZMK_FONT_COZETTA_ICONS_13
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_USB_STATUS
+  bool "Widget for USB status"
+  depends on ZMK_USB && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+  select ZMK_FONT_COZETTA_ICONS_13
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_BATTERY_STATUS
+  bool "Widget for battery charge information, using small icons"
+  depends on ZMK_BATTERY_REPORTING
+  select ZMK_FONT_MICRO5_10
+  select ZMK_FONT_COZETTA_ICONS_13
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_LAYER_STATUS
+  bool "Widget for layer status"
+  depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+  select ZMK_FONT_PIXEL_MPLUS_BOLD_10
+  select ZMK_FONT_TEKO_BOLD_15
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_LAYER_INDICATORS
+  bool "Widget for layer status"
+  depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+  select ZMK_FONT_MICRO5_10
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_PERIPHERAL_STATUS
+  bool "Widget for split peripheral status"
+  depends on BT && ZMK_SPLIT && !ZMK_SPLIT_ROLE_CENTRAL
+  select ZMK_FONT_MICRO5_10
+  select ZMK_FONT_COZETTA_ICONS_13
+  select LV_USE_FLEX
+  select LV_USE_LABEL
+
+config ZMK_WIDGET_CUSTOM_HID_INDICATORS
+  bool "Widget for HID indicators"
+  depends on ZMK_HID_INDICATORS && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+  select ZMK_FONT_PIXEL_MPLUS_BOLD_10
+  select LV_USE_FLEX
+  select LV_USE_LABEL

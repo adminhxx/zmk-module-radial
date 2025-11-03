@@ -1,0 +1,10 @@
+# Copyright (c) 2020 Phytec Messtechnik GmbH, Peter Johanson
+# SPDX-License-Identifier: Apache-2.0
+
+config UC8175_YA
+    bool "UltraChip UC8175 compatible display controller (yet another) driver"
+	  default y
+	  depends on DT_HAS_ULTRACHIP_UC8175_YA_ENABLED
+	  select SPI
+	  help
+	    Enable (yet another) driver for UC8175 compatible controller.

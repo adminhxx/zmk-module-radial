@@ -1,0 +1,280 @@
+# Copyright (c) 2020, Phytec Messtechnik GmbH, Peter Johanson
+# Copyright (c) 2024 The ZMK Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: UC8175 EPD display controller
+
+compatible: "ultrachip,uc8175,ya"
+
+include: [spi-device.yaml, display-controller.yaml]
+
+properties:
+  reset-gpios:
+    type: phandle-array
+    required: true
+    description: RESET pin.
+
+      The RESET pin of GD7965 is active low.
+      If connected directly the MCU pin should be configured
+      as active low.
+
+  dc-gpios:
+    type: phandle-array
+    required: true
+    description: DC pin.
+
+      The DC pin of GD7965 is active low (transmission command byte).
+      If connected directly the MCU pin should be configured
+      as active low.
+
+  busy-gpios:
+    type: phandle-array
+    required: true
+    description: BUSY pin.
+
+      The BUSY pin of GD7965 is active low.
+      If connected directly the MCU pin should be configured
+      as active low.
+
+  power-off-on-write:
+    type: boolean
+    description: |
+      Request power-off(POF) command on display_write()
+
+  deep-sleep-on-blanking:
+    type: boolean
+    description: |
+      Request deep-sleep(DSLP) command on display_blanking_on()
+
+  blanking:
+    type: int
+    default: 3
+    description: |
+      Blanking Mode
+
+      0: Keep display content
+      1: White (1-indexed color)
+      2: Black (0-indexed color)
+      3: Invert (Default. reduce ghosting)
+
+  blanking-on-suspend:
+    type: int
+    default: 1
+    description: |
+      Blanking Mode on suspend
+
+      0: Keep display content
+      1: White (1-indexed color)
+      2: Black (0-indexed color)
+      3: Invert
+
+  full-screen-refresh:
+    type: boolean
+    description: |
+      forcing full-screen refresh
+
+  anti-ghosting:
+    type: boolean
+    description: |
+      Enable anti-ghosting
+
+      full refresh black/white on blanking_on() nad pm_suspend
+
+  psr:
+    type: int
+    default: 0x6f
+    description: |
+      Panel Setting (PSR) value
+
+      RES[7:6] Resolution
+        00b: 80 x 160
+        01b: 80 x 128
+        10b: 64 x 128
+        11b: 64 x 96
+      REG[5:4] LUT Select
+        00b: LUT from HW
+        01b: LUT from OTP
+        10b: LUT from registers
+        11b: LUT from registers
+      UD[3] Gate Selection
+        0: Scan down
+        1: Scan up
+      SHL[2] Source SHift Direction
+        0: Shift left
+        1: Shift right
+      SHD_N[1] Charge pump switch
+        0: off
+        1: on
+      RST_N[0] Soft reset
+        0: Reset. Charge pump OFF, Register data are set to their default values, all drivers will be
+            reset,and all functions will be disabled. Source/Gate/Border/VCOM will be released to
+            floating.
+        1: No effect
+
+  pwr:
+    type: uint8-array
+    default: [0x03, 0x00, 0x26, 0x26]
+    description: |
+      Power Setting (PWR) values
+
+       VDS_EN 0[1] Source Power Selection
+         0: External source power from VDH/VDL pins
+         1: Internal voltage generation circuit for both VDH/VDL (Default)
+       VDG_EN 0[0] Gate Power Selection
+         0: External gate power from VGH/VGL pins
+         1: Internal voltage generation circuit for both VGH/VGL(Default)
+       VDG_LVL 1[3:0] VGH/VGL Voltage Level selection
+         000b: VGH=16V, VGL= -16V (Default)
+         001b: VGH=15V, VGL= -15V
+         010b: VGH=14V, VGL= -14V
+         011b: VGH=13V, VGL= -13V
+         100b: VGH=12V, VGL= -12V
+         101b: VGH=11V, VGL= -11V
+         others: VGH=11V, VGL= -11V
+       VDH_LVL 2[5:0] internal VDH power selection
+         2.4V + 0.2 * n (Default n=100110b 10V)
+       VDL_LVL 3[5:0] internal VDL power selection
+         -2.4V - 0.2 * n (Default n=100110b -10V)
+
+  cpset:
+    type: int
+    default: 0x3f
+    description: |
+      Charge pump Setting (CPSET) values
+
+        CPINT[5:4] pump time interval
+          00b: 20ms
+          01b: 30ms
+          10b: 40ms
+          11b: 50ms
+        CPS[3:2] pump driving strength
+          00b - 11b: Strength 1 - 4
+        CPFRQ[1:0] pump frequencey
+          00b: 1KHz
+          01b: 2KHz
+          10b: 4KHz
+          11b: 8KHz
+
+  lutopt:
+    type: uint8-array
+    default: [0x00, 0x00]
+    description: |
+      LUTOPT XON and the options of LUT.
+
+        0[0] 0x00 Stage-1 All-Gate-On
+        0[1] 0x00 Stage-2 All-Gate-On
+        0[2] 0x00 Stage-3 All-Gate-On
+        0[3] 0x00 Stage-4 All-Gate-On
+        1[4]  Selection of LUT of 20degC - 30degC
+          0: 4.8s
+          1: 1.8s
+        1[1:0]: Selection of LUT of 0degC - 5degC
+          00b: 10s
+          01b: 13.2s
+          1xb: 15s
+
+  pll:
+    type: int
+    default: 17  # 11:30Hz  17:45Hz  19:50Hz  23:60Hz  35:90Hz 39:100Hz
+    description: |
+      Clock fre,quency
+
+        [5:0] clock frequency
+          Range 0...39 (2.5Hz ... 100Hz)
+          2.5Hz + 2.5Hz * n (Default n=17 45Hz)
+
+  cdi:
+    type: int
+    default: 0x52
+    description: |
+      VCOM and data interval value
+
+        The interval of VCOM  and data output. When setting the vertical back porch, the total
+        blanking will be kept (10 Hsync).
+
+        VBD [7:6] Border LUT selection.
+          00b: VCOM
+          01b: 0-indexd color, depends on DDX[0]
+          10b: 1-indexd color, depends on DDX[0]
+          11b: Floating
+        DDX [5:4] Data Polarity
+          DDX[0] Data Proarity
+             0 0=White(LUTW) 1=Black(LUTB)
+             1 0=Black(LUTB) 1=White(LUTW)
+          DDX[1] XOR Refresh
+             0 refresh all piexsls of DTM2 frame-buffer
+             1 refresh only differential pixels between of DTM1 and DTM2
+        CDI [2:0] VCOM to Data Interval. Interval time setting between VCOM and driver data. Default: 5 Hsync
+          000b: 7hsync
+          001b: 6hsync
+          010b: 5hsync
+          011b: 4hsync
+          100b: 3hsync
+          others: 2hsync
+
+  vdcs:
+    type: int
+    default: 18
+    description: |
+      VDCS (0x82) VCOM_DC value
+
+        [5:0] VCOM_DC setting
+           Range 0...58 (-0.1v ... -3v)
+          -0.1v - 0.05v * n (Default n=18 -1v)
+
+  pws:
+    type: int
+    default: 0x33
+    description: |
+      PWS (0xe3) Power Saving Width
+
+        VCOM_W[7:4] VCOM_DC setting
+          n line period (Default n=3 3 line period)
+        SD_W[3:0] VCOM_DC setting
+          n * 2 uS (Default n=3 6uS)
+
+  tcon:
+    type: int
+    default: 0x22
+    description: |
+       TCON(0x60) non-overlap period of Gate and Source
+
+         S2G[7:4]
+         G2S[3:0]
+           4 x n + 4 period (Default n=2 12)
+
+  lutw:
+    type: uint8-array
+    default: [
+      0x60, 0x01, 0x01, 0x00, 0x00, 0x01,
+      0x80, 0x0f, 0x00, 0x00, 0x00, 0x01
+    ]
+    description: |
+      White Look-up table
+
+      6 bytes per stage (max 7 stages)
+        +0[7:6] Phase 0
+        +0[5:4] Phase 1
+        +0[3:2] Phase 2
+        +0[1:0] Phase 3
+          Phase n
+            00b: GND
+            01b: VDH
+            10b: VDL
+            10b: floating
+        +1 Number of frame for pahse 0
+        +2 Number of frame for pahse 1
+        +3 Number of frame for phase 2
+        +4 Number of frame for phase 3
+        +5 times to repeat
+
+  lutb:
+    type: uint8-array
+    default: [
+      0x90, 0x01, 0x01, 0x00, 0x00, 0x01,
+      0x40, 0x0f, 0x00, 0x00, 0x00, 0x01
+    ]
+    description: |
+      Black Look-up table
+
+      see lutw

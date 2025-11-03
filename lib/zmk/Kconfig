@@ -1,0 +1,112 @@
+# TODO maybe better to define in device-tree as property of keymap
+config ZMK_HID_EXTRA_KEYS
+    bool "Enable extra keys"
+    default n
+
+if ZMK_HID_EXTRA_KEYS
+
+# --------------------------------------------
+# CONFIG_ZMK_EXTRA_KEY_n (n=0...7)
+#  value : 0xaabbcccc
+#   aa bit24..31: usage page for collection
+#   bb bit16..23: usage for collection if aa != 0
+#                 usage page if aa == 0
+#   cccc bit0..15: usage
+#  keycode in keymap -> 0x00ff000x
+#    x 0-7 extra key index
+#  TODO  16bit usage/usage_page is not supported
+#  TODO  maybe better to define in device-tree
+# --------------------------------------------
+
+config ZMK_HID_EXTRA_KEY_0
+    hex "Extra key code 0"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_1
+    hex "Extra key code 1"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_2
+    hex "Extra key code 2"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_3
+    hex "Extra key code 3"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_4
+    hex "Extra key code 4"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_5
+    hex "Extra key code 5"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_6
+    hex "Extra key code 6"
+    default 0x0
+config ZMK_HID_EXTRA_KEY_7
+    hex "Extra key code 7"
+    default 0x0
+
+endif # ZMK_HID_EXTRA_KEYS
+
+config ZMK_USB_HOST_OS
+    bool "Enable detecting USB host os"
+
+if ZMK_USB_HOST_OS
+
+config ZMK_USB_HOST_OS_DEBUG
+    bool "Enable debug for USB_HOST_OS"
+    default y if ZMK_CUSTOM_SHELL_CMD
+
+endif
+
+config ZMK_USB_AUTO_SWITCH_LAYER
+    bool "Enable auto switch layer"
+    default n
+    select ZMK_USB_HOST_OS
+
+if ZMK_USB_AUTO_SWITCH_LAYER
+
+config ZMK_USB_AUTO_SWITCH_LAYER_IF_DARWIN
+    int "Mac layer"
+
+config ZMK_USB_AUTO_SWITCH_LAYER_UNLESS_DARWIN
+    int "Win layer"
+
+endif # ZMK_AUTO_SWITCH_LAYER
+
+config ZMK_RADIAL_CONTROLLER
+    bool "Enable ZMK Radial Controller"
+    default n
+
+if ZMK_RADIAL_CONTROLLER
+
+config ZMK_RADIAL_CONTROLLER_CONTACT_POSITION
+    bool "Enable ZMK Radial Controller contact position"
+    default n
+
+if ZMK_BLE
+
+config ZMK_BLE_RADIAL_CONTROLLER_REPORT_QUEUE_SIZE
+    int "Max number of radial controller HID reports to queue for sending over BLE"
+    default 5
+
+endif # ZMK_BLE
+
+endif # ZMK_RADIAL_CONTROLLER
+
+config ZMK_CUSTOM_SHELL_CMD
+    bool "Enable custom shell command"
+    default y if SHELL
+
+config ZMK_INDICATOR_LED
+    bool "Enable indicator LEDs"
+    select LED
+    select ZMK_HID_INDICATORS
+
+config ZMK_PWM_BUZZER
+    bool "Enable PWM buzzer"
+    depends on PWM
+    select ZMK_LOW_PRIORITY_WORK_QUEUE
+
+config ZMK_BEEP
+    bool "Enable beep for output status"
+    select ZMK_PWM_BUZZER
+
+rsource "display/Kconfig"
