@@ -32,4 +32,3 @@ if (CONFIG_BOARD_CYBER60_REV_D)
   target_sources(app PRIVATE cyber60_led.c)
 endif()
 
-add_subdirectory(display)
